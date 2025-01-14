@@ -3,6 +3,7 @@ const slides = document.querySelectorAll('.slides'); // Seleciona todos os slide
 const indicators = document.querySelectorAll('.indicator'); // Seleciona todos os indicadores
 const intervalTime = 10000; // Intervalo de tempo para alternar os slides (10 segundos)
 
+// Função para exibir o slide atual
 function showSlide(index) {
   slides.forEach((slide, i) => {
     slide.classList.toggle('active', i === index); // Adiciona a classe 'active' ao slide correto
@@ -11,6 +12,7 @@ function showSlide(index) {
   currentSlide = index; // Atualiza o índice do slide atual
 }
 
+// Função para avançar para o próximo slide
 function nextSlide() {
   const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
   if (next === 0) {
@@ -34,7 +36,6 @@ indicators.forEach(indicator => {
 // Inicia o slideshow com um intervalo de tempo
 setInterval(nextSlide, intervalTime);
 
-
 // Função para atualizar o relógio digital
 function updateClock() {
   const clockElement = document.getElementById('digitalClock'); // Seleciona o elemento do relógio
@@ -50,3 +51,33 @@ setInterval(updateClock, 1000);
 
 // Define o valor inicial do relógio
 updateClock();
+
+// Wake Lock API para evitar que a tela entre em modo de espera
+let wakeLock = null;
+
+// Função para solicitar o Wake Lock
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen'); // Ativa o Wake Lock
+      console.log('Wake Lock ativado.');
+    } else {
+      console.log('API Wake Lock não é suportada neste navegador.');
+    }
+  } catch (err) {
+    console.error(`Falha ao ativar o Wake Lock: ${err.name}, ${err.message}`);
+  }
+}
+
+// Libera o Wake Lock ao sair da aba ou fechar a página
+window.addEventListener('visibilitychange', () => {
+  if (wakeLock !== null && document.visibilityState === 'hidden') {
+    wakeLock.release().then(() => {
+      wakeLock = null;
+      console.log('Wake Lock liberado.');
+    });
+  }
+});
+
+// Solicita o Wake Lock ao carregar a página
+requestWakeLock();
