@@ -81,3 +81,25 @@ window.addEventListener('visibilitychange', () => {
 
 // Solicita o Wake Lock ao carregar a página
 requestWakeLock();
+
+// Função para prevenir o modo de espera da TV
+function preventStandby() {
+  // Criar um elemento de vídeo com o caminho do seu arquivo
+  const videoElement = document.createElement("video");
+  videoElement.src = "VideoTeste.mp4"; // Caminho para o arquivo de vídeo
+  videoElement.loop = true;
+  videoElement.muted = true;
+  videoElement.play();
+
+  // Tornar o vídeo invisível
+  videoElement.style.position = "absolute";
+  videoElement.style.width = "1px";
+  videoElement.style.height = "1px";
+  videoElement.style.opacity = "0";
+
+  // Adicionar o vídeo ao corpo da página
+  document.body.appendChild(videoElement);
+}
+
+// Chamar a função para prevenir o standby
+preventStandby();
