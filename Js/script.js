@@ -3,7 +3,7 @@ const slides = document.querySelectorAll('.slides'); // Seleciona todos os slide
 const indicators = document.querySelectorAll('.indicator'); // Seleciona todos os indicadores
 const intervalTime = 10000; // Intervalo de tempo para alternar os slides (10 segundos)
 
-// Função para exibir o slide atual
+// Função para exibir o slide atual com transição suave
 function showSlide(index) {
   slides.forEach((slide, i) => {
     slide.classList.toggle('active', i === index); // Adiciona a classe 'active' ao slide correto
@@ -79,24 +79,20 @@ requestWakeLock();
 
 // Função para prevenir o modo de espera da TV
 function preventStandby() {
-  // Criar um elemento de vídeo com o caminho do seu arquivo
   const videoElement = document.createElement("video");
   videoElement.src = "Imagens/VideoTeste1.mp4"; // Caminho para o arquivo de vídeo
   videoElement.loop = true;
   videoElement.muted = true;
 
-  // Tenta reproduzir o vídeo
   videoElement.play().catch(err => {
     console.warn("Falha ao reproduzir o vídeo:", err.message);
   });
 
-  // Tornar o vídeo invisível
   videoElement.style.position = "absolute";
   videoElement.style.width = "1px";
   videoElement.style.height = "1px";
   videoElement.style.opacity = "0";
 
-  // Adicionar o vídeo ao corpo da página
   document.body.appendChild(videoElement);
 }
 
@@ -115,4 +111,10 @@ setInterval(simulateMouseMove, 5 * 60 * 1000);
 
 // Chamar a função para prevenir o standby
 preventStandby();
+
+// Transição suave entre slides
+slides.forEach(slide => {
+  slide.style.transition = 'opacity 0.5s ease-in-out'; // Define a transição
+});
+
 
