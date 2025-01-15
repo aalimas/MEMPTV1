@@ -81,7 +81,7 @@ requestWakeLock();
 function preventStandby() {
   // Criar um elemento de vídeo com o caminho do seu arquivo
   const videoElement = document.createElement("video");
-  videoElement.src = "Imagens/VideoTeste.mp4"; // Caminho para o arquivo de vídeo
+  videoElement.src = "Imagens/VideoTeste1.mp4"; // Caminho para o arquivo de vídeo
   videoElement.loop = true;
   videoElement.muted = true;
 
