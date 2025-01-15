@@ -18,13 +18,16 @@ function nextSlide() {
   showSlide(next); // Exibe o próximo slide
 }
 
-// Adiciona evento de clique nos indicadores
-indicators.forEach((indicator, index) => {
-  indicator.addEventListener('click', (event) => {
-    event.preventDefault(); // Impede comportamento padrão
-    showSlide(index); // Exibe o slide correspondente ao índice
-  });
-});
+function nextSlide() {
+  const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
+  if (next === 0) {
+    // Se o próximo slide for o primeiro (índice 0), recarrega a página
+    window.location.reload();
+  } else {
+    // Caso contrário, exibe o próximo slide
+    showSlide(next);
+  }
+}
 
 // Inicia o slideshow com um intervalo de tempo
 setInterval(nextSlide, intervalTime);
