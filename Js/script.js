@@ -12,16 +12,11 @@ function showSlide(index) {
   currentSlide = index; // Atualiza o índice do slide atual
 }
 
-// Função para avançar para o próximo slide
-function nextSlide() {
-  const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
-  showSlide(next); // Exibe o próximo slide
-}
-
+// Função para avançar para o próximo slide e recarregar a página no início
 function nextSlide() {
   const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
   if (next === 0) {
-    // Se o próximo slide for o primeiro (índice 0), recarrega a página
+    // Recarrega a página se o próximo slide for o primeiro
     window.location.reload();
   } else {
     // Caso contrário, exibe o próximo slide
@@ -119,5 +114,3 @@ preventStandby();
 slides.forEach(slide => {
   slide.style.transition = 'opacity 0.5s ease-in-out'; // Define a transição
 });
-
-
