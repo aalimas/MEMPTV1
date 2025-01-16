@@ -67,9 +67,9 @@ function simulateMouseClick() {
 }
 
 // Intervalo para simular o movimento do mouse ou clique
-setInterval(simulateMouseActivity, 40000);  // A cada 40 segundos
+//setInterval(simulateMouseActivity, 40000);  // A cada 40 segundos
 // Ou, se preferir simular cliques:
-// setInterval(simulateMouseClick, 30000);
+setInterval(simulateMouseClick, 30000);
 
 
 // Atualiza o relógio a cada segundo
