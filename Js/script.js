@@ -12,7 +12,6 @@ function showSlide(index) {
   currentSlide = index; // Atualiza o índice do slide atual
 }
 
-
 // Função para avançar para o próximo slide e recarregar a página no final
 function nextSlide() {
   const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
@@ -41,9 +40,8 @@ function updateClock() {
   }
 }
 
-// Função para simular o movimento do mouse e evitar o modo de repouso
-function simulateMouseActivity() {
-  // Simula o movimento do mouse em posições aleatórias na tela
+// Função para simular o movimento do mouse
+function simulateMouseMove() {
   const event = new MouseEvent("mousemove", {
     bubbles: true,
     cancelable: true,
@@ -51,7 +49,7 @@ function simulateMouseActivity() {
     clientY: Math.random() * window.innerHeight,
   });
   document.dispatchEvent(event);
-  console.log("Movimento do mouse simulado para manter a tela ativa.");
+  console.log("Movimento do mouse simulado.");
 }
 
 // Função para simular um clique a cada intervalo
@@ -67,10 +65,9 @@ function simulateMouseClick() {
 }
 
 // Intervalo para simular o movimento do mouse ou clique
-//setInterval(simulateMouseActivity, 40000);  // A cada 40 segundos
+// setInterval(simulateMouseActivity, 40000);  // A cada 40 segundos
 // Ou, se preferir simular cliques:
 setInterval(simulateMouseClick, 30000);
-
 
 // Atualiza o relógio a cada segundo
 setInterval(updateClock, 1000);
