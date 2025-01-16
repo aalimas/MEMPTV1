@@ -12,6 +12,35 @@ function showSlide(index) {
   currentSlide = index; // Atualiza o índice do slide atual
 }
 
+
+// Função para avançar para o próximo slide e recarregar a página no final
+function nextSlide() {
+  const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
+  if (next === 0) {
+    // Recarrega a página ao atingir o último slide
+    simulateMouseMove(); // Simula o movimento do mouse antes da recarga
+    window.location.reload(); // Recarrega a página
+  } else {
+    // Exibe o próximo slide
+    showSlide(next);
+  }
+}
+
+// Inicia o slideshow com um intervalo de tempo
+setInterval(nextSlide, intervalTime);
+
+// Função para atualizar o relógio digital
+function updateClock() {
+  const clockElement = document.getElementById('digitalClock'); // Seleciona o elemento do relógio
+  if (clockElement) { // Verifica se o elemento existe
+    const now = new Date(); // Obtém a data e hora atuais
+    const hours = String(now.getHours()).padStart(2, '0'); // Formata a hora com 2 dígitos
+    const minutes = String(now.getMinutes()).padStart(2, '0'); // Formata os minutos com 2 dígitos
+    const seconds = String(now.getSeconds()).padStart(2, '0'); // Formata os segundos com 2 dígitos
+    clockElement.textContent = `${hours}:${minutes}:${seconds}`; // Atualiza o texto do relógio
+  }
+}
+
 // Função para simular o movimento do mouse e evitar o modo de repouso
 function simulateMouseActivity() {
   // Simula o movimento do mouse em posições aleatórias na tela
@@ -42,34 +71,6 @@ setInterval(simulateMouseActivity, 40000);  // A cada 40 segundos
 // Ou, se preferir simular cliques:
 // setInterval(simulateMouseClick, 30000);
 
-
-// Função para avançar para o próximo slide e recarregar a página no final
-function nextSlide() {
-  const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
-  if (next === 0) {
-    // Recarrega a página ao atingir o último slide
-    simulateMouseMove(); // Simula o movimento do mouse antes da recarga
-    window.location.reload(); // Recarrega a página
-  } else {
-    // Exibe o próximo slide
-    showSlide(next);
-  }
-}
-
-// Inicia o slideshow com um intervalo de tempo
-setInterval(nextSlide, intervalTime);
-
-// Função para atualizar o relógio digital
-function updateClock() {
-  const clockElement = document.getElementById('digitalClock'); // Seleciona o elemento do relógio
-  if (clockElement) { // Verifica se o elemento existe
-    const now = new Date(); // Obtém a data e hora atuais
-    const hours = String(now.getHours()).padStart(2, '0'); // Formata a hora com 2 dígitos
-    const minutes = String(now.getMinutes()).padStart(2, '0'); // Formata os minutos com 2 dígitos
-    const seconds = String(now.getSeconds()).padStart(2, '0'); // Formata os segundos com 2 dígitos
-    clockElement.textContent = `${hours}:${minutes}:${seconds}`; // Atualiza o texto do relógio
-  }
-}
 
 // Atualiza o relógio a cada segundo
 setInterval(updateClock, 1000);
