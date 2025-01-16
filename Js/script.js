@@ -22,12 +22,12 @@ function nextSlide() {
     simulateMouseClick(); // Simula o clique do mouse no segundo slide
   }
 
-  // Se for o último slide, recarrega a página
+  // Quando o primeiro slide é exibido novamente, recarrega a página
   if (next === 0) {
     setTimeout(() => {
       simulateMouseMove(); // Simula o movimento do mouse antes da recarga
       window.location.reload(); // Recarrega a página após o intervalo
-    }, intervalTime);
+    }, intervalTime); // A recarga acontece após o intervalo
   }
 }
 
@@ -135,3 +135,4 @@ slides.forEach(slide => {
 
 // Simula movimento do mouse ao carregar a página
 simulateMouseMove();
+
