@@ -16,19 +16,19 @@ function showSlide(index) {
 function nextSlide() {
   const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
 
-  // Recarregar a página antes de exibir o primeiro slide
+  // Se for o próximo slide após o último (retornando ao primeiro), recarregue a página
   if (next === 0) {
     setTimeout(() => {
-      simulateMouseMove(); // Simula movimento antes da recarga
+      simulateMouseMove(); // Simula o movimento do mouse antes da recarga
       window.location.reload(); // Recarrega a página
-    }, 100); // Pequeno atraso para evitar conflitos de transição
-  } else {
-    showSlide(next); // Exibe o próximo slide
+    }, 100); // Pequeno atraso para garantir a recarga no momento correto
   }
+
+  showSlide(next); // Exibe o próximo slide
 
   // Quando o segundo slide for exibido, simula um clique
   if (next === 1) {
-    simulateMouseClick();
+    simulateMouseClick(); // Simula o clique do mouse no segundo slide
   }
 }
 
@@ -37,13 +37,13 @@ setInterval(nextSlide, intervalTime);
 
 // Função para atualizar o relógio digital
 function updateClock() {
-  const clockElement = document.getElementById('digitalClock');
-  if (clockElement) {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+  const clockElement = document.getElementById('digitalClock'); // Seleciona o elemento do relógio
+  if (clockElement) { // Verifica se o elemento existe
+    const now = new Date(); // Obtém a data e hora atuais
+    const hours = String(now.getHours()).padStart(2, '0'); // Formata a hora com 2 dígitos
+    const minutes = String(now.getMinutes()).padStart(2, '0'); // Formata os minutos com 2 dígitos
+    const seconds = String(now.getSeconds()).padStart(2, '0'); // Formata os segundos com 2 dígitos
+    clockElement.textContent = `${hours}:${minutes}:${seconds}`; // Atualiza o texto do relógio
   }
 }
 
@@ -73,15 +73,18 @@ function simulateMouseClick() {
 
 // Atualiza o relógio a cada segundo
 setInterval(updateClock, 1000);
+
+// Define o valor inicial do relógio
 updateClock();
 
 // Wake Lock API para evitar que a tela entre em modo de espera
 let wakeLock = null;
 
+// Função para solicitar o Wake Lock
 async function requestWakeLock() {
   try {
     if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock = await navigator.wakeLock.request('screen'); // Ativa o Wake Lock
       console.log('Wake Lock ativado.');
     } else {
       console.warn('API Wake Lock não é suportada neste navegador.');
@@ -101,34 +104,51 @@ window.addEventListener('visibilitychange', () => {
   }
 });
 
+// Solicita o Wake Lock ao carregar a página
 requestWakeLock();
 
-// Função para prevenir o modo de espera da TV
+// Função para prevenir o modo de espera da TV com vídeo invisível
 function preventStandby() {
   const videoElement = document.createElement("video");
-  videoElement.src = "Imagens/VideoTeste1.mp4";
+  videoElement.src = "Imagens/VideoTeste1.mp4"; // Caminho para o arquivo de vídeo
   videoElement.loop = true;
   videoElement.muted = true;
-
-  videoElement.play().catch(err => {
-    console.warn("Falha ao reproduzir o vídeo:", err.message);
-  });
+  videoElement.playsInline = true; // Garante reprodução inline
+  videoElement.autoplay = true; // Força a reprodução automática
 
   videoElement.style.position = "absolute";
-  videoElement.style.width = "1px";
+  videoElement.style.width = "1px"; // Torna o vídeo invisível
   videoElement.style.height = "1px";
   videoElement.style.opacity = "0";
+  videoElement.style.zIndex = "-1"; // Envia o vídeo para trás
 
   document.body.appendChild(videoElement);
+
+  videoElement.play().then(() => {
+    console.log("Vídeo de prevenção de standby está sendo reproduzido.");
+  }).catch(err => {
+    console.error("Erro ao reproduzir o vídeo:", err.message);
+  });
 }
 
-// Chamar a função para prevenir o standby
+// Simulação de atividade de usuário para manter a TV ativa
+function simulateActivity() {
+  simulateMouseMove();
+  simulateMouseClick();
+}
+
+// Executa a simulação de atividade a cada 5 segundos
+setInterval(simulateActivity, 5000);
+
+// Chamar funções ao carregar a página
 preventStandby();
+simulateActivity();
 
 // Transição suave entre slides
 slides.forEach(slide => {
-  slide.style.transition = 'opacity 0.5s ease-in-out';
+  slide.style.transition = 'opacity 0.5s ease-in-out'; // Define a transição
 });
 
 // Simula movimento do mouse ao carregar a página
 simulateMouseMove();
+
