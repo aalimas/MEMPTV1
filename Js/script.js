@@ -12,16 +12,22 @@ function showSlide(index) {
   currentSlide = index; // Atualiza o índice do slide atual
 }
 
-// Função para avançar para o próximo slide e recarregar a página no final
+// Função para avançar para o próximo slide e simular clique no segundo slide
 function nextSlide() {
   const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
+  showSlide(next); // Exibe o próximo slide
+  
+  // Quando o segundo slide for exibido, simula um clique
+  if (next === 1) {
+    simulateMouseClick(); // Simula o clique do mouse no segundo slide
+  }
+
+  // Se for o último slide, recarrega a página
   if (next === 0) {
-    // Recarrega a página ao atingir o último slide
-    simulateMouseMove(); // Simula o movimento do mouse antes da recarga
-    window.location.reload(); // Recarrega a página
-  } else {
-    // Exibe o próximo slide
-    showSlide(next);
+    setTimeout(() => {
+      simulateMouseMove(); // Simula o movimento do mouse antes da recarga
+      window.location.reload(); // Recarrega a página após o intervalo
+    }, intervalTime);
   }
 }
 
@@ -52,7 +58,7 @@ function simulateMouseMove() {
   console.log("Movimento do mouse simulado.");
 }
 
-// Função para simular um clique a cada intervalo
+// Função para simular um clique do mouse
 function simulateMouseClick() {
   const event = new MouseEvent("click", {
     bubbles: true,
@@ -61,13 +67,8 @@ function simulateMouseClick() {
     clientY: Math.random() * window.innerHeight,
   });
   document.body.dispatchEvent(event);
-  console.log("Clique do mouse simulado para evitar repouso.");
+  console.log("Clique do mouse simulado.");
 }
-
-// Intervalo para simular o movimento do mouse ou clique
-// setInterval(simulateMouseActivity, 40000);  // A cada 40 segundos
-// Ou, se preferir simular cliques:
-setInterval(simulateMouseClick, 30000);
 
 // Atualiza o relógio a cada segundo
 setInterval(updateClock, 1000);
