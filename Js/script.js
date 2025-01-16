@@ -15,19 +15,20 @@ function showSlide(index) {
 // Função para avançar para o próximo slide e simular clique no segundo slide
 function nextSlide() {
   const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
+  
+  // Se for o próximo slide após o último (retornando ao primeiro), recarregue a página
+  if (next === 0) {
+    setTimeout(() => {
+      simulateMouseMove(); // Simula o movimento do mouse antes da recarga
+      window.location.reload(); // Recarrega a página
+    }, 100); // A recarga acontece após um pequeno atraso para garantir que o slide 0 não seja exibido antes
+  }
+
   showSlide(next); // Exibe o próximo slide
   
   // Quando o segundo slide for exibido, simula um clique
   if (next === 1) {
     simulateMouseClick(); // Simula o clique do mouse no segundo slide
-  }
-
-  // Quando o primeiro slide é exibido novamente, recarrega a página
-  if (next === 0) {
-    setTimeout(() => {
-      simulateMouseMove(); // Simula o movimento do mouse antes da recarga
-      window.location.reload(); // Recarrega a página após o intervalo
-    }, intervalTime); // A recarga acontece após o intervalo
   }
 }
 
@@ -135,4 +136,3 @@ slides.forEach(slide => {
 
 // Simula movimento do mouse ao carregar a página
 simulateMouseMove();
-
