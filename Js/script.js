@@ -12,23 +12,23 @@ function showSlide(index) {
   currentSlide = index; // Atualiza o índice do slide atual
 }
 
-// Função para avançar para o próximo slide e simular clique no segundo slide
+// Função para avançar para o próximo slide
 function nextSlide() {
   const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
-  
-  // Se for o próximo slide após o último (retornando ao primeiro), recarregue a página
+
+  // Recarregar a página antes de exibir o primeiro slide
   if (next === 0) {
     setTimeout(() => {
-      simulateMouseMove(); // Simula o movimento do mouse antes da recarga
+      simulateMouseMove(); // Simula movimento antes da recarga
       window.location.reload(); // Recarrega a página
-    }, 100); // A recarga acontece após um pequeno atraso para garantir que o slide 0 não seja exibido antes
+    }, 100); // Pequeno atraso para evitar conflitos de transição
+  } else {
+    showSlide(next); // Exibe o próximo slide
   }
 
-  showSlide(next); // Exibe o próximo slide
-  
   // Quando o segundo slide for exibido, simula um clique
   if (next === 1) {
-    simulateMouseClick(); // Simula o clique do mouse no segundo slide
+    simulateMouseClick();
   }
 }
 
@@ -37,13 +37,13 @@ setInterval(nextSlide, intervalTime);
 
 // Função para atualizar o relógio digital
 function updateClock() {
-  const clockElement = document.getElementById('digitalClock'); // Seleciona o elemento do relógio
-  if (clockElement) { // Verifica se o elemento existe
-    const now = new Date(); // Obtém a data e hora atuais
-    const hours = String(now.getHours()).padStart(2, '0'); // Formata a hora com 2 dígitos
-    const minutes = String(now.getMinutes()).padStart(2, '0'); // Formata os minutos com 2 dígitos
-    const seconds = String(now.getSeconds()).padStart(2, '0'); // Formata os segundos com 2 dígitos
-    clockElement.textContent = `${hours}:${minutes}:${seconds}`; // Atualiza o texto do relógio
+  const clockElement = document.getElementById('digitalClock');
+  if (clockElement) {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    clockElement.textContent = `${hours}:${minutes}:${seconds}`;
   }
 }
 
@@ -73,18 +73,15 @@ function simulateMouseClick() {
 
 // Atualiza o relógio a cada segundo
 setInterval(updateClock, 1000);
-
-// Define o valor inicial do relógio
 updateClock();
 
 // Wake Lock API para evitar que a tela entre em modo de espera
 let wakeLock = null;
 
-// Função para solicitar o Wake Lock
 async function requestWakeLock() {
   try {
     if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen'); // Ativa o Wake Lock
+      wakeLock = await navigator.wakeLock.request('screen');
       console.log('Wake Lock ativado.');
     } else {
       console.warn('API Wake Lock não é suportada neste navegador.');
@@ -104,13 +101,12 @@ window.addEventListener('visibilitychange', () => {
   }
 });
 
-// Solicita o Wake Lock ao carregar a página
 requestWakeLock();
 
 // Função para prevenir o modo de espera da TV
 function preventStandby() {
   const videoElement = document.createElement("video");
-  videoElement.src = "Imagens/VideoTeste1.mp4"; // Caminho para o arquivo de vídeo
+  videoElement.src = "Imagens/VideoTeste1.mp4";
   videoElement.loop = true;
   videoElement.muted = true;
 
@@ -131,7 +127,7 @@ preventStandby();
 
 // Transição suave entre slides
 slides.forEach(slide => {
-  slide.style.transition = 'opacity 0.5s ease-in-out'; // Define a transição
+  slide.style.transition = 'opacity 0.5s ease-in-out';
 });
 
 // Simula movimento do mouse ao carregar a página
