@@ -12,14 +12,25 @@ function showSlide(index) {
   currentSlide = index; // Atualiza o índice do slide atual
 }
 
-// Função para avançar para o próximo slide e recarregar a página no início
+// Função para simular movimento do mouse
+function simulateMouseMove() {
+  const event = new MouseEvent('mousemove', {
+    view: window,
+    bubbles: true,
+    cancelable: true
+  });
+  document.dispatchEvent(event);
+}
+
+// Função para avançar para o próximo slide e recarregar a página no final
 function nextSlide() {
   const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
   if (next === 0) {
-    // Recarrega a página se o próximo slide for o primeiro
-    window.location.reload();
+    // Recarrega a página ao atingir o último slide
+    simulateMouseMove(); // Simula o movimento do mouse antes da recarga
+    window.location.reload(); // Recarrega a página
   } else {
-    // Caso contrário, exibe o próximo slide
+    // Exibe o próximo slide
     showSlide(next);
   }
 }
@@ -94,19 +105,6 @@ function preventStandby() {
   document.body.appendChild(videoElement);
 }
 
-// Função para simular movimento do mouse
-function simulateMouseMove() {
-  const event = new MouseEvent('mousemove', {
-    view: window,
-    bubbles: true,
-    cancelable: true
-  });
-  document.dispatchEvent(event);
-}
-
-// Simula o movimento do mouse a cada 5 minutos
-setInterval(simulateMouseMove, 5 * 60 * 1000);
-
 // Chamar a função para prevenir o standby
 preventStandby();
 
@@ -114,3 +112,6 @@ preventStandby();
 slides.forEach(slide => {
   slide.style.transition = 'opacity 0.5s ease-in-out'; // Define a transição
 });
+
+// Simula movimento do mouse ao carregar a página
+simulateMouseMove();
