@@ -47,28 +47,32 @@ function updateClock() {
   }
 }
 
-// Função para simular o movimento do mouse
+// Função para simular o movimento do mouse no canto inferior direito
 function simulateMouseMove() {
+  const clientX = window.innerWidth - 10; // Canto inferior direito - X
+  const clientY = window.innerHeight - 10; // Canto inferior direito - Y
   const event = new MouseEvent("mousemove", {
     bubbles: true,
     cancelable: true,
-    clientX: Math.random() * window.innerWidth,
-    clientY: Math.random() * window.innerHeight,
+    clientX: clientX,
+    clientY: clientY,
   });
   document.dispatchEvent(event);
-  console.log("Movimento do mouse simulado.");
+  console.log("Movimento do mouse simulado no canto inferior direito.");
 }
 
-// Função para simular um clique do mouse
+// Função para simular um clique do mouse no canto inferior direito
 function simulateMouseClick() {
+  const clientX = window.innerWidth - 10; // Canto inferior direito - X
+  const clientY = window.innerHeight - 10; // Canto inferior direito - Y
   const event = new MouseEvent("click", {
     bubbles: true,
     cancelable: true,
-    clientX: Math.random() * window.innerWidth,
-    clientY: Math.random() * window.innerHeight,
+    clientX: clientX,
+    clientY: clientY,
   });
   document.body.dispatchEvent(event);
-  console.log("Clique do mouse simulado.");
+  console.log("Clique do mouse simulado no canto inferior direito.");
 }
 
 // Atualiza o relógio a cada segundo
@@ -151,4 +155,3 @@ slides.forEach(slide => {
 
 // Simula movimento do mouse ao carregar a página
 simulateMouseMove();
-
