@@ -2,55 +2,79 @@ let currentSlide = 0; // Índice do slide atual
 const slides = document.querySelectorAll('.slides'); // Seleciona todos os slides
 const indicators = document.querySelectorAll('.indicator'); // Seleciona todos os indicadores
 const intervalTime = 10000; // Intervalo de tempo para alternar os slides (10 segundos)
+let wakeLock = null; // Referência ao Wake Lock
 
-// Função para exibir o slide atual com transição suave
-function showSlide(index) {
-  slides.forEach((slide, i) => {
-    slide.classList.toggle('active', i === index); // Adiciona a classe 'active' ao slide correto
-    indicators[i].classList.toggle('active', i === index); // Adiciona a classe 'active' ao indicador correspondente
-  });
-  currentSlide = index; // Atualiza o índice do slide atual
+// Inicializa o relógio e slideshow
+initialize();
+
+// Função principal de inicialização
+function initialize() {
+  setupSlideTransitions();
+  updateClock();
+  setInterval(updateClock, 1000); // Atualiza o relógio a cada segundo
+  setInterval(nextSlide, intervalTime); // Alterna slides
+  requestWakeLock(); // Ativa Wake Lock
+  preventStandby(); // Previne standby com vídeo invisível
+  simulateActivity(); // Simula atividade ao carregar
+  setInterval(simulateActivity, 5000); // Simula atividade periodicamente
 }
 
-// Função para avançar para o próximo slide
-function nextSlide() {
-  const next = (currentSlide + 1) % slides.length; // Calcula o próximo slide
+// Configura as transições dos slides
+function setupSlideTransitions() {
+  slides.forEach(slide => {
+    slide.style.transition = 'opacity 0.5s ease-in-out'; // Define transição suave
+  });
+}
 
-  // Se for o próximo slide após o último (retornando ao primeiro), recarregue a página
+// Exibe o slide atual com transição suave
+function showSlide(index) {
+  slides.forEach((slide, i) => {
+    slide.classList.toggle('active', i === index); // Atualiza classe 'active'
+    indicators[i]?.classList.toggle('active', i === index); // Atualiza indicador
+  });
+  currentSlide = index; // Atualiza índice do slide atual
+}
+
+// Avança para o próximo slide
+function nextSlide() {
+  const next = (currentSlide + 1) % slides.length;
+  showSlide(next);
+
+  // Se for o próximo slide após o último (voltando ao primeiro), recarregue a página
   if (next === 0) {
     setTimeout(() => {
-      simulateMouseMove(); // Simula o movimento do mouse antes da recarga
-      window.location.reload(); // Recarrega a página
-    }, 100); // Pequeno atraso para garantir a recarga no momento correto
+      simulateMouseMove(); // Garante movimento do mouse no canto antes da recarga
+      window.location.reload();
+    }, 100);
   }
 
-  showSlide(next); // Exibe o próximo slide
+  // Garante que o movimento do mouse aconteça a cada troca de slide
+  simulateMouseMove();
 
   // Quando o segundo slide for exibido, simula um clique
   if (next === 1) {
-    simulateMouseClick(); // Simula o clique do mouse no segundo slide
+    simulateMouseClick();
   }
 }
 
-// Inicia o slideshow com um intervalo de tempo
-setInterval(nextSlide, intervalTime);
-
-// Função para atualizar o relógio digital
+// Atualiza o relógio digital
 function updateClock() {
-  const clockElement = document.getElementById('digitalClock'); // Seleciona o elemento do relógio
-  if (clockElement) { // Verifica se o elemento existe
-    const now = new Date(); // Obtém a data e hora atuais
-    const hours = String(now.getHours()).padStart(2, '0'); // Formata a hora com 2 dígitos
-    const minutes = String(now.getMinutes()).padStart(2, '0'); // Formata os minutos com 2 dígitos
-    const seconds = String(now.getSeconds()).padStart(2, '0'); // Formata os segundos com 2 dígitos
-    clockElement.textContent = `${hours}:${minutes}:${seconds}`; // Atualiza o texto do relógio
+  const clockElement = document.getElementById('digitalClock');
+  if (clockElement) {
+    const now = new Date();
+    const formattedTime = now.toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    clockElement.textContent = formattedTime;
   }
 }
 
-// Função para simular o movimento do mouse no canto inferior direito
+// Simula o movimento do mouse sempre no canto inferior direito
 function simulateMouseMove() {
-  const clientX = window.innerWidth - 10; // Canto inferior direito - X
-  const clientY = window.innerHeight - 10; // Canto inferior direito - Y
+  const clientX = window.innerWidth - 10; // Coordenada X: Canto inferior direito
+  const clientY = window.innerHeight - 10; // Coordenada Y: Canto inferior direito
   const event = new MouseEvent("mousemove", {
     bubbles: true,
     cancelable: true,
@@ -58,13 +82,18 @@ function simulateMouseMove() {
     clientY: clientY,
   });
   document.dispatchEvent(event);
+
+  // Move o cursor para o canto inferior direito
+  if ('pointerLockElement' in document || 'mozPointerLockElement' in document) {
+    document.body.style.cursor = "none"; // Oculta o cursor
+  }
   console.log("Movimento do mouse simulado no canto inferior direito.");
 }
 
-// Função para simular um clique do mouse no canto inferior direito
+// Ajusta o clique do mouse sempre no canto inferior direito
 function simulateMouseClick() {
-  const clientX = window.innerWidth - 10; // Canto inferior direito - X
-  const clientY = window.innerHeight - 10; // Canto inferior direito - Y
+  const clientX = window.innerWidth - 10; // Coordenada X: Canto inferior direito
+  const clientY = window.innerHeight - 10; // Coordenada Y: Canto inferior direito
   const event = new MouseEvent("click", {
     bubbles: true,
     cancelable: true,
@@ -72,86 +101,61 @@ function simulateMouseClick() {
     clientY: clientY,
   });
   document.body.dispatchEvent(event);
+
   console.log("Clique do mouse simulado no canto inferior direito.");
 }
 
-// Atualiza o relógio a cada segundo
-setInterval(updateClock, 1000);
-
-// Define o valor inicial do relógio
-updateClock();
-
-// Wake Lock API para evitar que a tela entre em modo de espera
-let wakeLock = null;
-
-// Função para solicitar o Wake Lock
+// Solicita o Wake Lock
 async function requestWakeLock() {
   try {
     if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen'); // Ativa o Wake Lock
+      wakeLock = await navigator.wakeLock.request('screen');
       console.log('Wake Lock ativado.');
     } else {
-      console.warn('API Wake Lock não é suportada neste navegador.');
+      console.warn('API Wake Lock não suportada.');
     }
   } catch (err) {
-    console.error(`Falha ao ativar o Wake Lock: ${err.name}, ${err.message}`);
+    console.error(`Erro ao ativar o Wake Lock: ${err.name}, ${err.message}`);
   }
-}
 
-// Libera o Wake Lock ao sair da aba ou fechar a página
-window.addEventListener('visibilitychange', () => {
-  if (wakeLock !== null && document.visibilityState === 'hidden') {
-    wakeLock.release().then(() => {
-      wakeLock = null;
-      console.log('Wake Lock liberado.');
-    });
-  }
-});
-
-// Solicita o Wake Lock ao carregar a página
-requestWakeLock();
-
-// Função para prevenir o modo de espera da TV com vídeo invisível
-function preventStandby() {
-  const videoElement = document.createElement("video");
-  videoElement.src = "Imagens/VideoTeste1.mp4"; // Caminho para o arquivo de vídeo
-  videoElement.loop = true;
-  videoElement.muted = true;
-  videoElement.playsInline = true; // Garante reprodução inline
-  videoElement.autoplay = true; // Força a reprodução automática
-
-  videoElement.style.position = "absolute";
-  videoElement.style.width = "1px"; // Torna o vídeo invisível
-  videoElement.style.height = "1px";
-  videoElement.style.opacity = "0";
-  videoElement.style.zIndex = "-1"; // Envia o vídeo para trás
-
-  document.body.appendChild(videoElement);
-
-  videoElement.play().then(() => {
-    console.log("Vídeo de prevenção de standby está sendo reproduzido.");
-  }).catch(err => {
-    console.error("Erro ao reproduzir o vídeo:", err.message);
+  window.addEventListener('visibilitychange', () => {
+    if (wakeLock && document.visibilityState === 'hidden') {
+      wakeLock.release().then(() => {
+        wakeLock = null;
+        console.log('Wake Lock liberado.');
+      });
+    }
   });
 }
 
-// Simulação de atividade de usuário para manter a TV ativa
+// Previne o modo de espera da TV com vídeo invisível
+function preventStandby() {
+  const videoElement = document.createElement("video");
+  Object.assign(videoElement, {
+    src: "Imagens/VideoTeste1.mp4",
+    loop: true,
+    muted: true,
+    playsInline: true,
+    autoplay: true,
+  });
+
+  Object.assign(videoElement.style, {
+    position: "absolute",
+    width: "1px",
+    height: "1px",
+    opacity: "0",
+    zIndex: "-1",
+  });
+
+  document.body.appendChild(videoElement);
+
+  videoElement.play()
+    .then(() => console.log("Vídeo de prevenção de standby reproduzido."))
+    .catch(err => console.error("Erro ao reproduzir vídeo:", err.message));
+}
+
+// Simula atividade de usuário
 function simulateActivity() {
   simulateMouseMove();
   simulateMouseClick();
 }
-
-// Executa a simulação de atividade a cada 5 segundos
-setInterval(simulateActivity, 5000);
-
-// Chamar funções ao carregar a página
-preventStandby();
-simulateActivity();
-
-// Transição suave entre slides
-slides.forEach(slide => {
-  slide.style.transition = 'opacity 0.5s ease-in-out'; // Define a transição
-});
-
-// Simula movimento do mouse ao carregar a página
-simulateMouseMove();
