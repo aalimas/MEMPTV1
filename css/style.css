@@ -13,8 +13,6 @@ body {
   align-items: center;
   height: 100vh;
   background-color: #000;
-  overflow: hidden; /* Evita rolagem */
-  cursor: none; /* Oculta o cursor padrão */
 }
 
 /* Contêiner do slideshow */
@@ -45,13 +43,27 @@ body {
 
 /* Estilo para a imagem centralizada */
 .center-image {
-  max-width: 100%; /* Ajusta a largura máxima da imagem sem ultrapassar o contêiner */
-  max-height: 100%; /* Ajusta a altura máxima sem ultrapassar o contêiner */
-  object-fit: cover; /* Garante que a imagem preencha proporcionalmente */
-  object-position: center;
+  width: 100%; /* Faz com que a imagem ocupe 100% da largura do slide */
+  height: 100%; /* Faz com que a imagem ocupe 100% da altura do slide */
+  object-fit: fill; /* Ajusta a imagem para preencher a área disponível, podendo distorcer */
 }
 
-/* Layout das grades */
+/* Novo slide com 3 imagens divididas */
+.slides .grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Divide o slide em 3 partes iguais */
+  gap: 0; /* Remove o gap entre as imagens */
+  height: 100%; /* Garante que as imagens ocupem toda a altura */
+  width: 100%; /* Garante que as imagens ocupem toda a largura */
+}
+
+.slides .grid3 img {
+  width: 100%; /* Faz com que as imagens ocupem 100% da largura disponível */
+  height: 100%; /* Faz com que as imagens ocupem 100% da altura disponível */
+  object-fit: fill; /* Ajusta as imagens para preencher a área disponível, podendo distorcer */
+}
+
+/* Layout das grades para outros slides */
 .grid, .grid1 {
   display: grid;
   gap: 10px; /* Espaçamento entre as colunas e linhas */
@@ -70,8 +82,8 @@ body {
 
 .grid img, .grid1 img {
   width: 100%; /* Faz as imagens ocuparem toda a largura da célula */
-  height: auto; /* Mantém a proporção da imagem */
-  object-fit: cover; /* Faz as imagens preencherem a área sem distorcer */
+  height: 100%; /* Faz as imagens ocuparem toda a altura da célula */
+  object-fit: fill; /* Faz as imagens preencherem a área disponível, podendo distorcer */
   border-radius: 5px; /* Bordas arredondadas nas imagens */
 }
 
@@ -137,22 +149,22 @@ body {
 /* Responsividade */
 @media (max-width: 1024px) {
   .grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 colunas para telas intermediárias */
+      grid-template-columns: repeat(3, 1fr); /* 3 colunas para telas intermediárias */
   }
 }
 
 @media (max-width: 768px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 colunas em telas menores */
+      grid-template-columns: repeat(2, 1fr); /* 2 colunas em telas menores */
   }
 }
 
 @media (max-width: 480px) {
   .grid {
-    grid-template-columns: 1fr; /* 1 coluna em telas muito pequenas */
+      grid-template-columns: 1fr; /* 1 coluna em telas muito pequenas */
   }
   .footer-text, .digital-clock {
-    font-size: 16px;
+      font-size: 16px;
   }
 }
 
@@ -171,18 +183,20 @@ body {
   font-family: 'Arial', sans-serif; /* Estilo da fonte */
 }
 
-/* Cursor personalizado no canto inferior direito */
-#customCursor {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  background-color: transparent; /* Pode alterar para "red" para debug */
-  border-radius: 50%;
-  z-index: 9999;
-  pointer-events: none; /* Garante que o cursor não interfere */
-  display: none; /* Inicialmente oculto */
+:root {
+  --font-small: 14px;
+  --font-medium: 18px;
+  --font-large: 24px;
 }
 
-body.cursor-visible #customCursor {
-  display: block; /* Exibe o cursor apenas quando necessário */
+.footer-text {
+  font-size: var(--font-small);
+}
+
+.digital-clock {
+  font-size: var(--font-medium);
+}
+
+.slide-header {
+  font-size: var(--font-large);
 }
