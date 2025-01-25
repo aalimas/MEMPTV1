@@ -13,6 +13,8 @@ body {
   align-items: center;
   height: 100vh;
   background-color: #000;
+  overflow: hidden; /* Evita rolagem */
+  cursor: none; /* Oculta o cursor padrão */
 }
 
 /* Contêiner do slideshow */
@@ -169,22 +171,18 @@ body {
   font-family: 'Arial', sans-serif; /* Estilo da fonte */
 }
 
-:root {
-  --font-small: 14px;
-  --font-medium: 18px;
-  --font-large: 24px;
+/* Cursor personalizado no canto inferior direito */
+#customCursor {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background-color: transparent; /* Pode alterar para "red" para debug */
+  border-radius: 50%;
+  z-index: 9999;
+  pointer-events: none; /* Garante que o cursor não interfere */
+  display: none; /* Inicialmente oculto */
 }
 
-.footer-text {
-  font-size: var(--font-small);
+body.cursor-visible #customCursor {
+  display: block; /* Exibe o cursor apenas quando necessário */
 }
-
-.digital-clock {
-  font-size: var(--font-medium);
-}
-
-.slide-header {
-  font-size: var(--font-large);
-}
-
-  
