@@ -4,20 +4,28 @@ const indicators = document.querySelectorAll('.indicator'); // Seleciona todos o
 const intervalTime = 10000; // Intervalo de tempo para alternar os slides (10 segundos)
 let wakeLock = null; // Referência ao Wake Lock
 
-// Inicializa o relógio e slideshow
-initialize();
-
-// Função principal de inicialização
-function initialize() {
-  setupSlideTransitions();
-  updateClock();
-  setInterval(updateClock, 1000); // Atualiza o relógio a cada segundo
-  setInterval(nextSlide, intervalTime); // Alterna slides
-  requestWakeLock(); // Ativa Wake Lock
-  preventStandby(); // Previne standby com vídeo invisível
-  simulateActivity(); // Simula atividade ao carregar
-  setInterval(simulateActivity, 5000); // Simula atividade periodicamente
+// Função para entrar no modo de tela cheia
+function enterFullScreen() {
+  const element = document.documentElement; // Aponta para o <html>
+  if (element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen();
+  } else if (element.msRequestFullscreen) {
+    element.msRequestFullscreen();
+  }
+  console.log("Modo de tela cheia ativado.");
 }
+
+// Monitorar saída do modo de tela cheia e reativá-lo
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+    console.log("Tela cheia desativada. Reativando...");
+    enterFullScreen();
+  }
+});
 
 // Configura as transições dos slides
 function setupSlideTransitions() {
@@ -43,13 +51,13 @@ function nextSlide() {
   // Se for o próximo slide após o último (voltando ao primeiro), recarregue a página
   if (next === 0) {
     setTimeout(() => {
-      simulateMouseMove(); // Garante movimento do mouse no canto antes da recarga
+      moveCursorToBottomRight(); // Garante movimento do mouse antes da recarga
       window.location.reload();
     }, 100);
   }
 
-  // Garante que o movimento do mouse aconteça a cada troca de slide
-  simulateMouseMove();
+  // Move o cursor para o canto inferior direito
+  moveCursorToBottomRight();
 
   // Quando o segundo slide for exibido, simula um clique
   if (next === 1) {
@@ -71,26 +79,7 @@ function updateClock() {
   }
 }
 
-// Simula o movimento do mouse sempre no canto inferior direito
-function simulateMouseMove() {
-  const clientX = window.innerWidth - 10; // Coordenada X: Canto inferior direito
-  const clientY = window.innerHeight - 10; // Coordenada Y: Canto inferior direito
-  const event = new MouseEvent("mousemove", {
-    bubbles: true,
-    cancelable: true,
-    clientX: clientX,
-    clientY: clientY,
-  });
-  document.dispatchEvent(event);
-
-  // Move o cursor para o canto inferior direito
-  if ('pointerLockElement' in document || 'mozPointerLockElement' in document) {
-    document.body.style.cursor = "none"; // Oculta o cursor
-  }
-  console.log("Movimento do mouse simulado no canto inferior direito.");
-}
-
-// Ajusta o clique do mouse sempre no canto inferior direito
+// Simula o clique do mouse sempre no canto inferior direito
 function simulateMouseClick() {
   const clientX = window.innerWidth - 10; // Coordenada X: Canto inferior direito
   const clientY = window.innerHeight - 10; // Coordenada Y: Canto inferior direito
@@ -103,6 +92,32 @@ function simulateMouseClick() {
   document.body.dispatchEvent(event);
 
   console.log("Clique do mouse simulado no canto inferior direito.");
+}
+
+// Move o cursor para o canto inferior direito visualmente
+function moveCursorToBottomRight() {
+  const cursorElement = document.getElementById("customCursor");
+  if (!cursorElement) {
+    // Cria um elemento de cursor customizado, se ainda não existir
+    const customCursor = document.createElement("div");
+    customCursor.id = "customCursor";
+    Object.assign(customCursor.style, {
+      position: "fixed",
+      width: "10px",
+      height: "10px",
+      backgroundColor: "transparent", // Pode usar "red" para visualizar
+      borderRadius: "50%",
+      zIndex: "9999",
+      pointerEvents: "none",
+    });
+    document.body.appendChild(customCursor);
+  }
+
+  // Atualiza a posição do cursor para o canto inferior direito
+  const customCursor = document.getElementById("customCursor");
+  customCursor.style.left = `${window.innerWidth - 15}px`; // Ajusta posição X
+  customCursor.style.top = `${window.innerHeight - 15}px`; // Ajusta posição Y
+  console.log("Cursor movido visualmente para o canto inferior direito.");
 }
 
 // Solicita o Wake Lock
@@ -156,6 +171,19 @@ function preventStandby() {
 
 // Simula atividade de usuário
 function simulateActivity() {
-  simulateMouseMove();
+  moveCursorToBottomRight();
   simulateMouseClick();
 }
+
+// Inicialização principal
+window.onload = () => {
+  enterFullScreen(); // Ativa tela cheia
+  setupSlideTransitions(); // Configura slides
+  updateClock(); // Atualiza relógio
+  setInterval(updateClock, 1000); // Atualiza relógio a cada segundo
+  setInterval(nextSlide, intervalTime); // Troca slides
+  requestWakeLock(); // Previne standby
+  preventStandby(); // Garante atividade na TV
+  simulateActivity(); // Movimenta cursor e clica no início
+  setInterval(simulateActivity, 5000); // Simula atividade regularmente
+};
