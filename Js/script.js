@@ -1,25 +1,20 @@
 let currentSlide = 0; // Índice do slide atual
 const slides = document.querySelectorAll('.slides'); // Seleciona todos os slides
 const indicators = document.querySelectorAll('.indicator'); // Seleciona todos os indicadores
-const intervalTime = 10000; // Intervalo de tempo para alternar os slides (10 segundos)
+const intervalTime = 10000; // Intervalo de tempo padrão para alternar os slides (10 segundos)
+let slideTimer; // Referência ao timer
 let wakeLock = null; // Referência ao Wake Lock
 
 // Função para entrar no modo de tela cheia
 function enterFullScreen() {
-  const element = document.documentElement; // Aponta para o <html>
+  const element = document.documentElement;
   if (element.requestFullscreen) {
     element.requestFullscreen();
-  } else if (element.mozRequestFullScreen) {
-    element.mozRequestFullScreen();
-  } else if (element.webkitRequestFullscreen) {
-    element.webkitRequestFullscreen();
-  } else if (element.msRequestFullscreen) {
-    element.msRequestFullscreen();
   }
   console.log("Modo de tela cheia ativado.");
 }
 
-// Monitorar saída do modo de tela cheia e reativá-lo
+// Monitorar saída do modo de tela cheia
 document.addEventListener("fullscreenchange", () => {
   if (!document.fullscreenElement) {
     console.log("Tela cheia desativada. Reativando...");
@@ -30,17 +25,17 @@ document.addEventListener("fullscreenchange", () => {
 // Configura as transições dos slides
 function setupSlideTransitions() {
   slides.forEach(slide => {
-    slide.style.transition = 'opacity 0.5s ease-in-out'; // Define transição suave
+    slide.style.transition = 'opacity 0.5s ease-in-out';
   });
 }
 
 // Exibe o slide atual com transição suave
 function showSlide(index) {
   slides.forEach((slide, i) => {
-    slide.classList.toggle('active', i === index); // Atualiza classe 'active'
-    indicators[i]?.classList.toggle('active', i === index); // Atualiza indicador
+    slide.classList.toggle('active', i === index);
+    indicators[i]?.classList.toggle('active', i === index);
   });
-  currentSlide = index; // Atualiza índice do slide atual
+  currentSlide = index;
 }
 
 // Avança para o próximo slide
@@ -48,21 +43,24 @@ function nextSlide() {
   const next = (currentSlide + 1) % slides.length;
   showSlide(next);
 
-  // Se for o próximo slide após o último (voltando ao primeiro), recarregue a página
   if (next === 0) {
     setTimeout(() => {
-      moveCursorToBottomRight(); // Garante movimento do mouse antes da recarga
+      moveCursorToBottomRight();
       window.location.reload();
     }, 100);
   }
 
-  // Move o cursor para o canto inferior direito
   moveCursorToBottomRight();
 
-  // Quando o segundo slide for exibido, simula um clique
   if (next === 1) {
     simulateMouseClick();
   }
+}
+
+// Reinicia a contagem de slides com um novo tempo
+function resetSlideTimer(delay = 60000) {
+  clearInterval(slideTimer);
+  slideTimer = setInterval(nextSlide, delay);
 }
 
 // Atualiza o relógio digital
@@ -81,8 +79,8 @@ function updateClock() {
 
 // Simula o clique do mouse sempre no canto inferior direito
 function simulateMouseClick() {
-  const clientX = window.innerWidth - 10; // Coordenada X: Canto inferior direito
-  const clientY = window.innerHeight - 10; // Coordenada Y: Canto inferior direito
+  const clientX = window.innerWidth - 10;
+  const clientY = window.innerHeight - 10;
   const event = new MouseEvent("click", {
     bubbles: true,
     cancelable: true,
@@ -90,22 +88,19 @@ function simulateMouseClick() {
     clientY: clientY,
   });
   document.body.dispatchEvent(event);
-
   console.log("Clique do mouse simulado no canto inferior direito.");
 }
 
-// Move o cursor para o canto inferior direito visualmente
 function moveCursorToBottomRight() {
   const cursorElement = document.getElementById("customCursor");
   if (!cursorElement) {
-    // Cria um elemento de cursor customizado, se ainda não existir
     const customCursor = document.createElement("div");
     customCursor.id = "customCursor";
     Object.assign(customCursor.style, {
       position: "fixed",
       width: "10px",
       height: "10px",
-      backgroundColor: "transparent", // Pode usar "red" para visualizar
+      backgroundColor: "transparent",
       borderRadius: "50%",
       zIndex: "9999",
       pointerEvents: "none",
@@ -113,14 +108,12 @@ function moveCursorToBottomRight() {
     document.body.appendChild(customCursor);
   }
 
-  // Atualiza a posição do cursor para o canto inferior direito
   const customCursor = document.getElementById("customCursor");
-  customCursor.style.left = `${window.innerWidth - 15}px`; // Ajusta posição X
-  customCursor.style.top = `${window.innerHeight - 15}px`; // Ajusta posição Y
+  customCursor.style.left = `${window.innerWidth - 15}px`;
+  customCursor.style.top = `${window.innerHeight - 15}px`;
   console.log("Cursor movido visualmente para o canto inferior direito.");
 }
 
-// Solicita o Wake Lock
 async function requestWakeLock() {
   try {
     if ('wakeLock' in navigator) {
@@ -143,7 +136,6 @@ async function requestWakeLock() {
   });
 }
 
-// Previne o modo de espera da TV com vídeo invisível
 function preventStandby() {
   const videoElement = document.createElement("video");
   Object.assign(videoElement, {
@@ -169,21 +161,32 @@ function preventStandby() {
     .catch(err => console.error("Erro ao reproduzir vídeo:", err.message));
 }
 
-// Simula atividade de usuário
 function simulateActivity() {
   moveCursorToBottomRight();
   simulateMouseClick();
 }
 
-// Inicialização principal
+// Alternância de slides usando o teclado numérico
+function handleKeyPress(event) {
+  const key = event.key;
+  const slideIndex = parseInt(key, 10) - 1;
+
+  if (!isNaN(slideIndex) && slideIndex >= 0 && slideIndex < slides.length) {
+    showSlide(slideIndex); // Mostra o slide correspondente
+    console.log(`Slide ${key} exibido. Reiniciando temporizador.`);
+    resetSlideTimer(); // Espera 1 minuto antes de continuar automaticamente
+  }
+}
+
 window.onload = () => {
-  enterFullScreen(); // Ativa tela cheia
-  setupSlideTransitions(); // Configura slides
-  updateClock(); // Atualiza relógio
-  setInterval(updateClock, 1000); // Atualiza relógio a cada segundo
-  setInterval(nextSlide, intervalTime); // Troca slides
-  requestWakeLock(); // Previne standby
-  preventStandby(); // Garante atividade na TV
-  simulateActivity(); // Movimenta cursor e clica no início
-  setInterval(simulateActivity, 5000); // Simula atividade regularmente
+  enterFullScreen();
+  setupSlideTransitions();
+  updateClock();
+  setInterval(updateClock, 1000);
+  resetSlideTimer(intervalTime);
+  requestWakeLock();
+  preventStandby();
+  simulateActivity();
+  setInterval(simulateActivity, 5000);
+  document.addEventListener('keydown', handleKeyPress);
 };
