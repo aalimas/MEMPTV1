@@ -146,12 +146,13 @@ function preventStandby() {
     autoplay: true,
   });
 
+  // Modificação: tornando o vídeo visivelmente leve
   Object.assign(videoElement.style, {
     position: "absolute",
-    width: "1px",
-    height: "1px",
-    opacity: "0",
-    zIndex: "-1",
+    width: "10px",
+    height: "10px",
+    opacity: "0.1", // Torna o vídeo levemente visível
+    zIndex: "9999", // Traz o vídeo para o primeiro plano
   });
 
   document.body.appendChild(videoElement);
@@ -159,12 +160,38 @@ function preventStandby() {
   videoElement.play()
     .then(() => console.log("Vídeo de prevenção de standby reproduzido."))
     .catch(err => console.error("Erro ao reproduzir vídeo:", err.message));
+
+  // Garantir que o vídeo não seja pausado automaticamente
+  videoElement.addEventListener('pause', () => {
+    videoElement.play();
+    console.log("Vídeo reiniciado após pausa.");
+  });
 }
 
 function simulateActivity() {
   moveCursorToBottomRight();
   simulateMouseClick();
 }
+
+// Função para enviar requisição HTTP de "keep-alive"
+function sendKeepAliveRequest() {
+  // Modificar a URL para um endpoint válido ou de teste na sua rede
+  fetch('/keep-alive') 
+    .then(response => {
+      if (response.ok) {
+        console.log("Requisição keep-alive enviada com sucesso.");
+      } else {
+        console.log("Erro ao enviar requisição keep-alive.");
+      }
+    })
+    .catch(err => console.error("Erro ao enviar requisição keep-alive:", err));
+}
+
+// Modificação para simular atividade a cada 2 segundos
+setInterval(simulateActivity, 2000);
+
+// Enviar requisição keep-alive a cada 30 segundos
+setInterval(sendKeepAliveRequest, 30000);  // 30 segundos
 
 // Alternância de slides usando o teclado numérico
 function handleKeyPress(event) {
@@ -187,6 +214,7 @@ window.onload = () => {
   requestWakeLock();
   preventStandby();
   simulateActivity();
-  setInterval(simulateActivity, 5000);
+  setInterval(simulateActivity, 2000);
   document.addEventListener('keydown', handleKeyPress);
 };
+
