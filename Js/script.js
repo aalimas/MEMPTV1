@@ -92,23 +92,19 @@ function simulateMouseClick() {
 }
 
 function moveCursorToBottomRight() {
-  const cursorElement = document.getElementById("customCursor");
-  if (!cursorElement) {
-    const customCursor = document.createElement("div");
-    customCursor.id = "customCursor";
-    Object.assign(customCursor.style, {
-      position: "fixed",
-      width: "10px",
-      height: "10px",
-      backgroundColor: "transparent",
-      borderRadius: "50%",
-      zIndex: "9999",
-      pointerEvents: "none",
-    });
-    document.body.appendChild(customCursor);
-  }
+  const customCursor = document.createElement("div");
+  customCursor.id = "customCursor";
+  Object.assign(customCursor.style, {
+    position: "fixed",
+    width: "10px",
+    height: "10px",
+    backgroundColor: "transparent",
+    borderRadius: "50%",
+    zIndex: "9999",
+    pointerEvents: "none",
+  });
 
-  const customCursor = document.getElementById("customCursor");
+  document.body.appendChild(customCursor);
   customCursor.style.left = `${window.innerWidth - 15}px`;
   customCursor.style.top = `${window.innerHeight - 15}px`;
   console.log("Cursor movido visualmente para o canto inferior direito.");
@@ -128,60 +124,36 @@ async function requestWakeLock() {
 }
 
 function preventStandby() {
-  const videoElement = document.createElement("video");
-  Object.assign(videoElement, {
-    src: "Imagens/VideoTeste1.mp4",
-    loop: true,
-    muted: true,
-    playsInline: true,
-    autoplay: true,
+  simulateActivity();
+
+  // Movimentação leve do cursor continuamente para garantir atividade
+  setInterval(() => {
+    moveCursorRandomly();
+    simulateKeyPress(); // Simula pressionamento de tecla invisível
+  }, 1000);
+}
+
+function moveCursorRandomly() {
+  const event = new MouseEvent("mousemove", {
+    clientX: Math.random() * window.innerWidth,
+    clientY: Math.random() * window.innerHeight,
+    bubbles: true,
+    cancelable: true,
   });
+  document.body.dispatchEvent(event);
+  console.log("Movimento aleatório do cursor simulado.");
+}
 
-  // Modificação: tornando o vídeo visivelmente leve
-  Object.assign(videoElement.style, {
-    position: "absolute",
-    width: "10px",
-    height: "10px",
-    opacity: "0.1", // Torna o vídeo levemente visível
-    zIndex: "9999", // Traz o vídeo para o primeiro plano
-  });
-
-  document.body.appendChild(videoElement);
-
-  videoElement.play()
-    .then(() => console.log("Vídeo de prevenção de standby reproduzido."))
-    .catch(err => console.error("Erro ao reproduzir vídeo:", err.message));
-
-  // Garantir que o vídeo não seja pausado automaticamente
-  videoElement.addEventListener('pause', () => {
-    videoElement.play();
-    console.log("Vídeo reiniciado após pausa.");
-  });
+function simulateKeyPress() {
+  const event = new KeyboardEvent('keydown', { key: 'Shift', bubbles: true });
+  document.body.dispatchEvent(event);
+  console.log("Simulação de pressionamento de tecla.");
 }
 
 function simulateActivity() {
   moveCursorToBottomRight();
   simulateMouseClick();
 }
-
-// Função para enviar requisição HTTP de "keep-alive"
-function sendKeepAliveRequest() {
-  fetch('/keep-alive') 
-    .then(response => {
-      if (response.ok) {
-        console.log("Requisição keep-alive enviada com sucesso.");
-      } else {
-        console.log("Erro ao enviar requisição keep-alive.");
-      }
-    })
-    .catch(err => console.error("Erro ao enviar requisição keep-alive:", err));
-}
-
-// Aumenta o intervalo de simulação de atividade para 5 segundos
-setInterval(simulateActivity, 2000);  // 2 segundos para garantir que a atividade seja simulada com frequência alta
-
-// Enviar requisição keep-alive a cada 30 segundos
-setInterval(sendKeepAliveRequest, 30000);  // 30 segundos
 
 // Alternância de slides usando o teclado numérico
 function handleKeyPress(event) {
@@ -203,16 +175,5 @@ window.onload = () => {
   resetSlideTimer(intervalTime);
   requestWakeLock();
   preventStandby();
-  simulateActivity();
-  setInterval(simulateActivity, 2000); // Simulação de atividade a cada 2 segundos para garantir que a TV não entre em espera
   document.addEventListener('keydown', handleKeyPress);
-
-  // Revalidate Wake Lock every 30 seconds
-  setInterval(() => {
-    if (wakeLock) {
-      wakeLock.request().then(() => console.log('Wake Lock revalidado.'));
-    } else {
-      requestWakeLock();
-    }
-  }, 30000); // Revalidação a cada 30 segundos
 };
