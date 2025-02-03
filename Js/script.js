@@ -175,7 +175,6 @@ function simulateActivity() {
 
 // Função para enviar requisição HTTP de "keep-alive"
 function sendKeepAliveRequest() {
-  // Modificar a URL para um endpoint válido ou de teste na sua rede
   fetch('/keep-alive') 
     .then(response => {
       if (response.ok) {
@@ -187,8 +186,8 @@ function sendKeepAliveRequest() {
     .catch(err => console.error("Erro ao enviar requisição keep-alive:", err));
 }
 
-// Modificação para simular atividade a cada 2 segundos
-setInterval(simulateActivity, 2000);
+// Aumenta o intervalo de simulação de atividade para 5 segundos
+setInterval(simulateActivity, 5000);  // 5 segundos
 
 // Enviar requisição keep-alive a cada 30 segundos
 setInterval(sendKeepAliveRequest, 30000);  // 30 segundos
@@ -214,7 +213,6 @@ window.onload = () => {
   requestWakeLock();
   preventStandby();
   simulateActivity();
-  setInterval(simulateActivity, 2000);
+  setInterval(simulateActivity, 5000); // Simulação de atividade a cada 5 segundos
   document.addEventListener('keydown', handleKeyPress);
 };
-
