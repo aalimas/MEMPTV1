@@ -125,15 +125,6 @@ async function requestWakeLock() {
   } catch (err) {
     console.error(`Erro ao ativar o Wake Lock: ${err.name}, ${err.message}`);
   }
-
-  window.addEventListener('visibilitychange', () => {
-    if (wakeLock && document.visibilityState === 'hidden') {
-      wakeLock.release().then(() => {
-        wakeLock = null;
-        console.log('Wake Lock liberado.');
-      });
-    }
-  });
 }
 
 function preventStandby() {
@@ -187,7 +178,7 @@ function sendKeepAliveRequest() {
 }
 
 // Aumenta o intervalo de simulação de atividade para 5 segundos
-setInterval(simulateActivity, 5000);  // 5 segundos
+setInterval(simulateActivity, 2000);  // 2 segundos para garantir que a atividade seja simulada com frequência alta
 
 // Enviar requisição keep-alive a cada 30 segundos
 setInterval(sendKeepAliveRequest, 30000);  // 30 segundos
@@ -213,6 +204,15 @@ window.onload = () => {
   requestWakeLock();
   preventStandby();
   simulateActivity();
-  setInterval(simulateActivity, 5000); // Simulação de atividade a cada 5 segundos
+  setInterval(simulateActivity, 2000); // Simulação de atividade a cada 2 segundos para garantir que a TV não entre em espera
   document.addEventListener('keydown', handleKeyPress);
+
+  // Revalidate Wake Lock every 30 seconds
+  setInterval(() => {
+    if (wakeLock) {
+      wakeLock.request().then(() => console.log('Wake Lock revalidado.'));
+    } else {
+      requestWakeLock();
+    }
+  }, 30000); // Revalidação a cada 30 segundos
 };
