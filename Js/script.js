@@ -1,11 +1,10 @@
-let currentSlide = 0; // Índice do slide atual
-const slides = document.querySelectorAll('.slides'); // Seleciona todos os slides
-const indicators = document.querySelectorAll('.indicator'); // Seleciona todos os indicadores
-const intervalTime = 10000; // Intervalo de tempo padrão para alternar os slides (10 segundos)
-let slideTimer; // Referência ao timer
-let wakeLock = null; // Referência ao Wake Lock
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slides');
+const indicators = document.querySelectorAll('.indicator');
+const intervalTime = 10000;
+let slideTimer;
+let wakeLock = null;
 
-// Função para entrar no modo de tela cheia
 function enterFullScreen() {
   const element = document.documentElement;
   if (element.requestFullscreen) {
@@ -14,7 +13,6 @@ function enterFullScreen() {
   console.log("Modo de tela cheia ativado.");
 }
 
-// Monitorar saída do modo de tela cheia
 document.addEventListener("fullscreenchange", () => {
   if (!document.fullscreenElement) {
     console.log("Tela cheia desativada. Reativando...");
@@ -22,14 +20,12 @@ document.addEventListener("fullscreenchange", () => {
   }
 });
 
-// Configura as transições dos slides
 function setupSlideTransitions() {
   slides.forEach(slide => {
     slide.style.transition = 'opacity 0.5s ease-in-out';
   });
 }
 
-// Exibe o slide atual com transição suave
 function showSlide(index) {
   slides.forEach((slide, i) => {
     slide.classList.toggle('active', i === index);
@@ -38,7 +34,6 @@ function showSlide(index) {
   currentSlide = index;
 }
 
-// Avança para o próximo slide
 function nextSlide() {
   const next = (currentSlide + 1) % slides.length;
   showSlide(next);
@@ -57,13 +52,11 @@ function nextSlide() {
   }
 }
 
-// Reinicia a contagem de slides com um novo tempo
 function resetSlideTimer(delay = 60000) {
   clearInterval(slideTimer);
   slideTimer = setInterval(nextSlide, delay);
 }
 
-// Atualiza o relógio digital
 function updateClock() {
   const clockElement = document.getElementById('digitalClock');
   if (clockElement) {
@@ -77,10 +70,9 @@ function updateClock() {
   }
 }
 
-// Simula o clique do mouse sempre no canto inferior direito
 function simulateMouseClick() {
-  const clientX = window.innerWidth - 10;
-  const clientY = window.innerHeight - 10;
+  const clientX = Math.random() * window.innerWidth;
+  const clientY = Math.random() * window.innerHeight;
   const event = new MouseEvent("click", {
     bubbles: true,
     cancelable: true,
@@ -88,26 +80,30 @@ function simulateMouseClick() {
     clientY: clientY,
   });
   document.body.dispatchEvent(event);
-  console.log("Clique do mouse simulado no canto inferior direito.");
+  console.log("Clique do mouse simulado em posição aleatória.");
 }
 
 function moveCursorToBottomRight() {
-  const customCursor = document.createElement("div");
-  customCursor.id = "customCursor";
-  Object.assign(customCursor.style, {
-    position: "fixed",
-    width: "10px",
-    height: "10px",
-    backgroundColor: "transparent",
-    borderRadius: "50%",
-    zIndex: "9999",
-    pointerEvents: "none",
-  });
+  const cursorElement = document.getElementById("customCursor");
+  if (!cursorElement) {
+    const customCursor = document.createElement("div");
+    customCursor.id = "customCursor";
+    Object.assign(customCursor.style, {
+      position: "fixed",
+      width: "10px",
+      height: "10px",
+      backgroundColor: "transparent",
+      borderRadius: "50%",
+      zIndex: "9999",
+      pointerEvents: "none",
+    });
+    document.body.appendChild(customCursor);
+  }
 
-  document.body.appendChild(customCursor);
-  customCursor.style.left = `${window.innerWidth - 15}px`;
-  customCursor.style.top = `${window.innerHeight - 15}px`;
-  console.log("Cursor movido visualmente para o canto inferior direito.");
+  const customCursor = document.getElementById("customCursor");
+  customCursor.style.left = `${Math.random() * (window.innerWidth - 15)}px`;
+  customCursor.style.top = `${Math.random() * (window.innerHeight - 15)}px`;
+  console.log("Cursor movido aleatoriamente.");
 }
 
 async function requestWakeLock() {
@@ -121,16 +117,25 @@ async function requestWakeLock() {
   } catch (err) {
     console.error(`Erro ao ativar o Wake Lock: ${err.name}, ${err.message}`);
   }
+
+  window.addEventListener('visibilitychange', () => {
+    if (wakeLock && document.visibilityState === 'hidden') {
+      wakeLock.release().then(() => {
+        wakeLock = null;
+        console.log('Wake Lock liberado.');
+      });
+    }
+  });
 }
 
 function preventStandby() {
   simulateActivity();
 
-  // Movimentação leve do cursor continuamente para garantir atividade
   setInterval(() => {
     moveCursorRandomly();
-    simulateKeyPress(); // Simula pressionamento de tecla invisível
-  }, 1000);
+    simulateKeyPress();
+    simulateScroll();
+  }, 2000);
 }
 
 function moveCursorRandomly() {
@@ -145,9 +150,19 @@ function moveCursorRandomly() {
 }
 
 function simulateKeyPress() {
-  const event = new KeyboardEvent('keydown', { key: 'Shift', bubbles: true });
+  const keys = ['Shift', 'Alt', 'Control'];
+  const randomKey = keys[Math.floor(Math.random() * keys.length)];
+  const event = new KeyboardEvent('keydown', { key: randomKey, bubbles: true });
   document.body.dispatchEvent(event);
-  console.log("Simulação de pressionamento de tecla.");
+  console.log(`Simulação de pressionamento de tecla: ${randomKey}`);
+}
+
+function simulateScroll() {
+  window.scrollBy({
+    top: Math.random() * 10,
+    behavior: 'smooth'
+  });
+  console.log("Scroll suave simulado.");
 }
 
 function simulateActivity() {
@@ -155,15 +170,14 @@ function simulateActivity() {
   simulateMouseClick();
 }
 
-// Alternância de slides usando o teclado numérico
 function handleKeyPress(event) {
   const key = event.key;
   const slideIndex = parseInt(key, 10) - 1;
 
   if (!isNaN(slideIndex) && slideIndex >= 0 && slideIndex < slides.length) {
-    showSlide(slideIndex); // Mostra o slide correspondente
+    showSlide(slideIndex);
     console.log(`Slide ${key} exibido. Reiniciando temporizador.`);
-    resetSlideTimer(); // Espera 1 minuto antes de continuar automaticamente
+    resetSlideTimer();
   }
 }
 
