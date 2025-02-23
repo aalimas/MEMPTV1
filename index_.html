@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação de Slides</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            height: 100%;
+            overflow: hidden;
+        }
+        .slides-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+        .slide {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        .active {
+            display: block;
+        }
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+        .multi-image {
+            display: flex;
+            justify-content: space-between;
+            width: 100vw;
+            height: 100vh;
+        }
+        .multi-image img {
+            width: 33.33%;
+            height: 100%;
+            object-fit: fill;
+        }
+        .clock, .slide-indicator, .avatar-container, .explanation {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 18px;
+            font-family: Arial, sans-serif;
+        }
+        .clock {
+            bottom: 20px;
+            right: 20px;
+        }
+        .slide-indicator {
+            bottom: 20px;
+            left: 20px;
+        }
+        .avatar-container {
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .avatar-container img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        .explanation {
+            top: 20px;
+            left: 20px;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <div class="slide active">
+            <img src="Imagens/Ocupa.jpg" alt="Slide 1">
+            <div class="avatar-container">
+                <img src="Imagens/avatar1.JPG" alt="Avatar">
+            </div>
+            <div class="explanation">Slide1 - Ocupação Oficinal</div>
+        </div>
+        <div class="slide">
+            <div class="multi-image">
+                <img src="Imagens/ProgramaCpPorto.jpg" alt="Imagem 1">
+                <img src="Imagens/ProgramaCpRegional.jpg" alt="Imagem 2">
+                <img src="Imagens/ProgramaCpRegionalUDD9630.jpg" alt="Imagem 3">
+            </div>
+            <div class="avatar-container">
+                <img src="Imagens/avatar2.JPG" alt="Avatar">
+            </div>
+            <div class="explanation">Slide2 - Programas Semanais</div>
+        </div>
+        <div class="slide">
+            <div class="multi-image">
+                <img src="Imagens/ProgramaCpGeral.jpg" alt="Imagem 1">
+                <img src="Imagens/ProgramaCpRegionalRenfe.jpg" alt="Imagem 2">
+                <img src="Imagens/ProgramaCpTf.jpg" alt="Imagem 3">
+            </div>
+            <div class="avatar-container">
+                <img src="Imagens/avatar1.JPG" alt="Avatar">
+            </div>
+            <div class="explanation">Slide3 - Programas Semanais</div>
+        </div>
+        <div class="slide">
+            <img src="/Imagens/Dashboard.jpg" alt="Slide 3">
+            <div class="avatar-container">
+                <img src="Imagens/avatar2.JPG" alt="Avatar">
+            </div>
+            <div class="explanation">Slide4 - Dashboard</div>
+        </div>
+        <div class="clock" id="clock"></div>
+        <div class="slide-indicator" id="slide-indicator"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const slideIndicator = document.getElementById('slide-indicator');
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            updateSlideIndicator(index);
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+
+            // Recarregar a página quando o primeiro slide é mostrado novamente
+            if (currentSlide === 0) {
+                location.reload();
+            }
+        }
+
+        function startSlideShow() {
+            showSlide(currentSlide); // Show the first slide immediately
+            setInterval(function() {
+                // Set interval times (2 minutes for first slide, 1 minute for others)
+                let intervalTime = currentSlide === 0 ? 120000 : 60000; // 2 minutes for the first slide, 1 minute for others
+                nextSlide(); // Move to the next slide
+            }, 60000); // Run every minute
+        }
+
+        startSlideShow();
+
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateClock, 1000);
+
+        function updateSlideIndicator(index) {
+            slideIndicator.textContent = `Slide ${index + 1} de ${slides.length}`;
+        }
+
+        updateClock();
+        updateSlideIndicator(currentSlide);
+    </script>
+</body>
+</html>
