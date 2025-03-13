@@ -169,10 +169,9 @@ function simulateActivity() {
   moveCursorToBottomRight();
   simulateMouseClick();
 }
-
 function handleKeyPress(event) {
   const key = event.key;
-  const slideIndex = parseInt(key, 10) - 1;
+  const slideIndex = parseInt(key, 10);
 
   if (!isNaN(slideIndex) && slideIndex >= 0 && slideIndex < slides.length) {
     showSlide(slideIndex);
